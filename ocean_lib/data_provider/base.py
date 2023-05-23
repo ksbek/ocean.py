@@ -113,7 +113,7 @@ class DataServiceProviderBase:
 
     @staticmethod
     @enforce_types
-    def get_provider_address(provider_uri: str) -> Optional[str]:
+    def get_provider_address(provider_uri: str, chain_id: int) -> Optional[str]:
         """
         Return the provider address
         """
@@ -122,7 +122,13 @@ class DataServiceProviderBase:
                 "get", provider_uri
             ).json()
 
-            return provider_info["providerAddress"]
+            if "providerAddress" in provider_info:
+                logger.warning(
+                    "You might be using an older provider. ocean.py can not verify the chain id."
+                )
+                return provider_info["providerAddress"]
+
+            return provider_info["providerAddresses"][str(chain_id)]
         except requests.exceptions.RequestException:
             pass
 
@@ -156,10 +162,15 @@ class DataServiceProviderBase:
         except (requests.exceptions.RequestException, JSONDecodeError):
             raise InvalidURL(f"InvalidURL {service_endpoint}.")
 
-        if "providerAddress" not in response:
-            raise InvalidURL(
-                f"Invalid Provider URL {service_endpoint}, no providerAddress."
-            )
+        if "providerAddresses" not in response:
+            if "providerAddress" in response:
+                logger.warning(
+                    "You might be using an older provider. ocean.py can not verify the chain id."
+                )
+            else:
+                raise InvalidURL(
+                    f"Invalid Provider URL {service_endpoint}, no providerAddresses."
+                )
 
         return result
 

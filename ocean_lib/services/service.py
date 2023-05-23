@@ -303,7 +303,7 @@ class Service:
         self.compute_values["allowNetworkAccess"] = allow_network_access
         self.compute_values["allowRawAlgorithm"] = allow_raw_algorithm
 
-    def encrypt_files(self, nft_address):
+    def encrypt_files(self, nft_address, chain_id):
         if self.files and isinstance(self.files, str):
             return
 
@@ -316,6 +316,7 @@ class Service:
                 "files": files,
             },
             self.service_endpoint,
+            chain_id
         )
 
         self.files = encrypt_response.content.decode("utf-8")
