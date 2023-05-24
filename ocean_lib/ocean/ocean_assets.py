@@ -662,7 +662,7 @@ class OceanAssets:
         assert asset.chain_id == self._web3.eth.chain_id, "Chain id mismatch."
 
         for service in asset.services:
-            service.encrypt_files(asset.nft_address)
+            service.encrypt_files(asset.nft_address, asset.chain_id)
 
         # Validation by Aquarius
         validation_result, errors_or_proof = self.validate(asset)
